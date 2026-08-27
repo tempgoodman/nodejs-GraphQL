@@ -1,0 +1,42 @@
+name: Microservices CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-and-validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install & Test Product Subgraph
+        run: |
+          cd products-subgraph
+          npm install
+          npm run test
+
+      - name: Install & Test Order Subgraph
+        run: |
+          cd order-subgraph
+          npm install
+          npm run test
+
+
+      - name: Install Apollo Rover CLI
+        run: npm install -g @apollo/rover
+
+      - name: Validate Supergraph Composition
+        run: |
+          cd xapi-gateway
+          export APOLLO_ELV2_LICENSE="accept"          
+          rover supergraph compose --config ./supergraph.yaml --output supergraph.graphql
