@@ -15,17 +15,24 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  products-subgraph:
-    build: ./products-subgraph
+  product-subgraph:
+    build: ./product-subgraph
     ports:
       - "4001:4001"
     environment:
       - PORT=4001
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+    command: sh -c "sleep 10 && npm run start"
     depends_on:
-      - redis
+      redis:
+        condition: service_started
 
   order-subgraph:
     build: ./order-subgraph
@@ -36,11 +43,13 @@ services:
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - PRODUCTS_SUBGRAPH_URL=http://products-subgraph:4001/graphql
+      - PRODUCTS_SUBGRAPH_URL=http://product-subgraph:4001/graphql
+    command: sh -c "sleep 10 && npm run start"
     depends_on:
-      - rabbitmq
-      - redis
-      - products-subgraph
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   xapi-gateway:
     build: ./xapi-gateway
@@ -49,7 +58,7 @@ services:
     environment:
       - PORT=4000
     depends_on:
-      - products-subgraph
+      - product-subgraph
       - order-subgraph
 
 volumes:
