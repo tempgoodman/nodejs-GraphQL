@@ -1,0 +1,10 @@
+federation_version: "=2.3.0"
+subgraphs:
+  products:
+    routing_url: http://products-subgraph:4001/graphql 
+    schema:
+      file: ./products-schema.graphql
+  orders:
+    routing_url: http://order-subgraph:4002/graphql 
+    schema:
+      file: ./orders-schema.graphql

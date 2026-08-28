@@ -10,12 +10,17 @@ import amqp from 'amqplib';
 import { typeDefs } from './modules/orders/typeDefs';
 import { buildResolvers } from './modules/orders/resolvers';
 import { OrderService } from './modules/orders/OrderService';
+import dotenv from 'dotenv';
+dotenv.config();
 
 async function startServer() {
   const app = express();
-  const redis = new Redis();
+  const redis = new Redis({
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT),
+  });
   
-  const mqConnection = await amqp.connect('amqp://localhost');
+  const mqConnection = await amqp.connect(process.env.RABBITMQ_URL);
   const mqChannel = await mqConnection.createChannel();
   
   const QUEUE_NAME = 'order_created_events';

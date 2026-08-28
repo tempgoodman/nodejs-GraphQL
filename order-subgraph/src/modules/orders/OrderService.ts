@@ -1,5 +1,7 @@
 import { Channel } from 'amqplib';
 import { Redis } from 'ioredis';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export class OrderService {
   constructor(private redis: Redis, private mqChannel: Channel) {}
@@ -11,7 +13,7 @@ async createOrder(userId: string, items: { productId: string, quantity: number }
     const orderItems = [];
 
     const deductPromises = items.map(async (item) => {
-      const response = await fetch('http://localhost:4001/graphql', {
+      const response = await fetch(process.env.PRODUCTS_SUBGRAPH_URL!, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

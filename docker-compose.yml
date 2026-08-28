@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  products-subgraph:
+    build: ./products-subgraph
+    ports:
+      - "4001:4001"
+    environment:
+      - PORT=4001
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+
+  order-subgraph:
+    build: ./order-subgraph
+    ports:
+      - "4002:4002"
+    environment:
+      - PORT=4002
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PRODUCTS_SUBGRAPH_URL=http://products-subgraph:4001/graphql
+    depends_on:
+      - rabbitmq
+      - redis
+      - products-subgraph
+
+  xapi-gateway:
+    build: ./xapi-gateway
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+    depends_on:
+      - products-subgraph
+      - order-subgraph
+
+volumes:
+  redis-data:
+  rabbitmq-data:

@@ -21,7 +21,7 @@ jobs:
 
       - name: Install & Test Product Subgraph
         run: |
-          cd products-subgraph
+          cd product-subgraph
           npm install
           npm run test
 
@@ -39,4 +39,4 @@ jobs:
         run: |
           cd xapi-gateway
           export APOLLO_ELV2_LICENSE="accept"          
-          rover supergraph compose --config ./supergraph.yaml --output supergraph.graphql
+          rover supergraph compose --config ./supergraph-local.yaml --output supergraph.graphql

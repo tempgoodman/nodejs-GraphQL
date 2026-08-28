@@ -6,6 +6,8 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import { gql } from 'graphql-tag';
 import Redis from 'ioredis';
+import dotenv from 'dotenv';
+dotenv.config();
 
 import { typeDefs as productTypeDefs } from './modules/products/typeDefs';
 import { buildResolvers as buildProductResolvers } from './modules/products/resolvers';
@@ -15,7 +17,10 @@ import { MockProductRepository } from './modules/products/MockProductRepository'
 async function startServer() {
   const app = express();
   
-  const redis = new Redis();
+  const redis = new Redis({
+    host: process.env.REDIS_HOST,
+    port: Number(process.env.REDIS_PORT),
+  });
 
   const repository = new MockProductRepository();
   const productService = new ProductService(repository, redis);
@@ -36,7 +41,7 @@ async function startServer() {
     expressMiddleware(server, {
       context: async ({ req }) => {
         return {
-          productService, // 將 Service 放入 Context，方便第時升級用
+          productService, 
           userId: req.headers['x-user-id']
         };
       },
