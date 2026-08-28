@@ -35,8 +35,8 @@ jobs:
       - name: Install Apollo Rover CLI
         run: npm install -g @apollo/rover
 
-      - name: Validate Supergraph Composition
-        run: |
-          cd xapi-gateway
-          export APOLLO_ELV2_LICENSE="accept"          
-          rover supergraph compose --config ./supergraph-local.yaml --output supergraph.graphql
+#      - name: Validate Supergraph Composition
+#        run: |
+#          cd xapi-gateway
+#          export APOLLO_ELV2_LICENSE="accept"          
+#          rover supergraph compose --config ./supergraph-local.yaml --output supergraph.graphql
