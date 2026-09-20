@@ -32,7 +32,7 @@ async function startGateway() {
     },
   });
 
-  console.log(`🌌 Static Supergraph Gateway ready at ${url}`);
+  console.log(`Static Supergraph Gateway ready at ${url}`);
 }
 
 startGateway().catch(console.error);

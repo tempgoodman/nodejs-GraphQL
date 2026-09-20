@@ -1,20 +1,23 @@
-import { OrderService } from './OrderService';
+import { OrderService } from './OrderService.js';
+import { OrderMapper } from './OrderMapper.js';
 
 export const buildResolvers = (orderService: OrderService) => ({
   Query: {
-    getOrders: (_: any, _args: any, context: { userId?: string | null }) => {
+    getOrders: async (_: any, _args: any, context: { userId?: string | null }) => {
       if (!context.userId) {
         throw new Error('Authentication required');
       }
-      return orderService.getOrders(context.userId);
+      const orders = await orderService.getOrders(context.userId);
+      return OrderMapper.toGraphQLList(orders);
     },
   },
   Mutation: {
-    createOrder: (_: any, { items }: { items: any[] }, context: { userId?: string | null }) => {
+    createOrder: async (_: any, { items }: { items: any[] }, context: { userId?: string | null }) => {
       if (!context.userId) {
         throw new Error('Authentication required');
       }
-      return orderService.createOrder(context.userId, items);
+      const order = await orderService.createOrder(context.userId, items);
+      return OrderMapper.toGraphQL(order);
     },
     resetOrders: () => orderService.resetOrders(),
   },
