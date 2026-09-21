@@ -19,8 +19,8 @@ describe('MockProductRepository', () => {
   it('stores product quantity in saleQtyData instead of inline product stock', async () => {
     const product = await repository.findById('1');
 
-    expect(product?.stock).toBe(100);
-    expect(saleQtyData.find((item) => item.productId === '1')?.stockQty).toBe(100);
+    expect(product?.stock).toBe(101);
+    expect(saleQtyData.find((item) => item.productId === '1')?.stockQty).toBe(101);
     expect(leasingQtyData.find((item) => item.productId === '1')).toEqual(
       expect.objectContaining({
         leaseRemainQty: 0,
@@ -33,8 +33,8 @@ describe('MockProductRepository', () => {
   it('decreaseStock updates saleQtyData and returns mapped stock', async () => {
     const updated = await repository.decreaseStock('2', 10);
 
-    expect(updated?.stock).toBe(90);
-    expect(saleQtyData.find((item) => item.productId === '2')?.stockQty).toBe(90);
+    expect(updated?.stock).toBe(92);
+    expect(saleQtyData.find((item) => item.productId === '2')?.stockQty).toBe(92);
   });
 
   it('initializes sale and lease transaction stores as arrays', () => {

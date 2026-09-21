@@ -36,12 +36,14 @@ const productsData: ProductData[] = [
   { id: '4', name: 'Tesco Sliced White Bread', price: 0.85 },
 ];
 
-export const saleQtyData: SaleQty[] = [
+const initialSaleQtyData: SaleQty[] = [
   { id: 'sale-1', productId: '1', stockQty: 101, defectQty: 0 },
   { id: 'sale-2', productId: '2', stockQty: 102, defectQty: 0 },
   { id: 'sale-3', productId: '3', stockQty: 103, defectQty: 0 },
   { id: 'sale-4', productId: '4', stockQty: 104, defectQty: 0 },
 ];
+
+export const saleQtyData: SaleQty[] = initialSaleQtyData.map((item) => ({ ...item }));
 
 export const leasingQtyData: LeasingQty[] = [
   { id: 'lease-1', productId: '1', leaseRemainQty: 0, leaseLeasedQty: 0, defectQty: 0 },
@@ -99,8 +101,12 @@ export class MockProductRepository implements IProductRepository {
     throw new Error('Stock not sufficient or product not found');
   }
   async resetProduct(): Promise<boolean> {
-    for (const saleQty of saleQtyData) {
-      saleQty.stockQty = 100;
+    for (const initialSaleQty of initialSaleQtyData) {
+      const saleQty = saleQtyData.find((qty) => qty.productId === initialSaleQty.productId);
+      if (saleQty) {
+        saleQty.stockQty = initialSaleQty.stockQty;
+        saleQty.defectQty = initialSaleQty.defectQty;
+      }
     }
     return true;
   }
