@@ -45,12 +45,13 @@ const initialSaleQtyData: SaleQty[] = [
 
 export const saleQtyData: SaleQty[] = initialSaleQtyData.map((item) => ({ ...item }));
 
-export const leasingQtyData: LeasingQty[] = [
+const initialLeasingQtyData: LeasingQty[] = [
   { id: 'lease-1', productId: '1', leaseRemainQty: 0, leaseLeasedQty: 0, defectQty: 0 },
   { id: 'lease-2', productId: '2', leaseRemainQty: 0, leaseLeasedQty: 0, defectQty: 0 },
   { id: 'lease-3', productId: '3', leaseRemainQty: 0, leaseLeasedQty: 0, defectQty: 0 },
   { id: 'lease-4', productId: '4', leaseRemainQty: 0, leaseLeasedQty: 0, defectQty: 0 },
 ];
+export const leasingQtyData: LeasingQty[] = initialLeasingQtyData.map((item) => ({ ...item }));
 
 export const saleInventoryTransaction: InventoryTransaction[] = [];
 export const leaseInventoryTransaction: InventoryTransaction[] = [];
@@ -108,6 +109,16 @@ export class MockProductRepository implements IProductRepository {
         saleQty.defectQty = initialSaleQty.defectQty;
       }
     }
+    for (const initialLeasingQty of initialLeasingQtyData) {
+      const leasingQty = leasingQtyData.find((qty) => qty.productId === initialLeasingQty.productId);
+      if (leasingQty) {
+        leasingQty.leaseRemainQty = initialLeasingQty.leaseRemainQty;
+        leasingQty.leaseLeasedQty = initialLeasingQty.leaseLeasedQty;
+        leasingQty.defectQty = initialLeasingQty.defectQty;
+      }
+    }
+    saleInventoryTransaction.length = 0;
+    leaseInventoryTransaction.length = 0;
     return true;
   }
 

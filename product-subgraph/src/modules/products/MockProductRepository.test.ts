@@ -37,6 +37,41 @@ describe('MockProductRepository', () => {
     expect(saleQtyData.find((item) => item.productId === '2')?.stockQty).toBe(92);
   });
 
+  it('resetProduct restores seeded inventory state', async () => {
+    await repository.decreaseStock('1', 1);
+    const leasingRow = leasingQtyData.find((item) => item.productId === '1');
+    if (leasingRow) {
+      leasingRow.leaseRemainQty = 5;
+      leasingRow.leaseLeasedQty = 3;
+      leasingRow.defectQty = 1;
+    }
+    saleInventoryTransaction.push({
+      id: 'txn-sale-1',
+      transactionId: 'order-1',
+      status: 'SUCCESS',
+      quantityChange: -1
+    });
+    leaseInventoryTransaction.push({
+      id: 'txn-lease-1',
+      transactionId: 'lease-1',
+      status: 'SUCCESS',
+      quantityChange: 1
+    });
+
+    await repository.resetProduct();
+
+    expect(saleQtyData.find((item) => item.productId === '1')?.stockQty).toBe(101);
+    expect(leasingQtyData.find((item) => item.productId === '1')).toEqual(
+      expect.objectContaining({
+        leaseRemainQty: 0,
+        leaseLeasedQty: 0,
+        defectQty: 0
+      })
+    );
+    expect(saleInventoryTransaction).toHaveLength(0);
+    expect(leaseInventoryTransaction).toHaveLength(0);
+  });
+
   it('initializes sale and lease transaction stores as arrays', () => {
     expect(Array.isArray(saleInventoryTransaction)).toBe(true);
     expect(Array.isArray(leaseInventoryTransaction)).toBe(true);
