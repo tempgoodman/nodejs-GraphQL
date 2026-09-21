@@ -111,21 +111,8 @@ export class MockProductRepository implements IProductRepository {
     return toProduct(product);
   }
   async resetProduct(): Promise<boolean> {
-    for (const initialSaleQty of initialSaleQtyData) {
-      const saleQty = saleQtyData.find((qty) => qty.productId === initialSaleQty.productId);
-      if (saleQty) {
-        saleQty.stockQty = initialSaleQty.stockQty;
-        saleQty.defectQty = initialSaleQty.defectQty;
-      }
-    }
-    for (const initialLeasingQty of initialLeasingQtyData) {
-      const leasingQty = leasingQtyData.find((qty) => qty.productId === initialLeasingQty.productId);
-      if (leasingQty) {
-        leasingQty.leaseRemainQty = initialLeasingQty.leaseRemainQty;
-        leasingQty.leaseLeasedQty = initialLeasingQty.leaseLeasedQty;
-        leasingQty.defectQty = initialLeasingQty.defectQty;
-      }
-    }
+    saleQtyData.splice(0, saleQtyData.length, ...initialSaleQtyData.map((item) => ({ ...item })));
+    leasingQtyData.splice(0, leasingQtyData.length, ...initialLeasingQtyData.map((item) => ({ ...item })));
     saleInventoryTransaction.length = 0;
     leaseInventoryTransaction.length = 0;
     return true;

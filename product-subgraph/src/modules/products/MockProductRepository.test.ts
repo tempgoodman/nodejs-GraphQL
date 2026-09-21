@@ -33,6 +33,9 @@ describe('MockProductRepository', () => {
   it('decreaseStock updates saleQtyData and returns mapped stock', async () => {
     const updated = await repository.decreaseStock('2', 10);
 
+    expect(updated?.id).toBe('2');
+    expect(updated?.name).toBe('Tesco Bananas 5 Pack');
+    expect(updated?.price).toBe(0.75);
     expect(updated?.stock).toBe(92);
     expect(saleQtyData.find((item) => item.productId === '2')?.stockQty).toBe(92);
   });
