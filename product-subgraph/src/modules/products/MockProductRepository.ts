@@ -92,14 +92,23 @@ export class MockProductRepository implements IProductRepository {
     return { items, totalCount };
   }
 
-  async decreaseStock(id: string, quantity: number): Promise<Product | null> {
+  async decreaseStock(id: string, quantity: number): Promise<Product> {
     const product = productsData.find(p => p.id === id);
-    const saleQty = saleQtyData.find((qty) => qty.productId === id);
-    if (product && saleQty && saleQty.stockQty >= quantity) {
-      saleQty.stockQty -= quantity;
-      return toProduct(product);
+    if (!product) {
+      throw new Error('Product not found');
     }
-    throw new Error('Stock not sufficient or product not found');
+
+    const saleQty = saleQtyData.find((qty) => qty.productId === id);
+    if (!saleQty) {
+      throw new Error('Sale quantity data not found');
+    }
+
+    if (saleQty.stockQty < quantity) {
+      throw new Error('Insufficient stock');
+    }
+
+    saleQty.stockQty -= quantity;
+    return toProduct(product);
   }
   async resetProduct(): Promise<boolean> {
     for (const initialSaleQty of initialSaleQtyData) {

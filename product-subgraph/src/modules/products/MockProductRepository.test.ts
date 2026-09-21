@@ -37,6 +37,14 @@ describe('MockProductRepository', () => {
     expect(saleQtyData.find((item) => item.productId === '2')?.stockQty).toBe(92);
   });
 
+  it('decreaseStock throws when product does not exist', async () => {
+    await expect(repository.decreaseStock('999', 1)).rejects.toThrow('Product not found');
+  });
+
+  it('decreaseStock throws when stock is insufficient', async () => {
+    await expect(repository.decreaseStock('1', 999)).rejects.toThrow('Insufficient stock');
+  });
+
   it('resetProduct restores seeded inventory state', async () => {
     await repository.decreaseStock('1', 1);
     const leasingRow = leasingQtyData.find((item) => item.productId === '1');
