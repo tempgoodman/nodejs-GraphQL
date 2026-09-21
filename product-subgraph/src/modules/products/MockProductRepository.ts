@@ -93,6 +93,10 @@ export class MockProductRepository implements IProductRepository {
   }
 
   async decreaseStock(id: string, quantity: number): Promise<Product> {
+    if (quantity <= 0) {
+      throw new Error('Quantity must be greater than 0');
+    }
+
     const product = productsData.find(p => p.id === id);
     if (!product) {
       throw new Error('Product not found');

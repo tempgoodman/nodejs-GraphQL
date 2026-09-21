@@ -48,6 +48,11 @@ describe('MockProductRepository', () => {
     await expect(repository.decreaseStock('1', 999)).rejects.toThrow('Insufficient stock');
   });
 
+  it('decreaseStock rejects non-positive quantities', async () => {
+    await expect(repository.decreaseStock('1', 0)).rejects.toThrow('Quantity must be greater than 0');
+    await expect(repository.decreaseStock('1', -1)).rejects.toThrow('Quantity must be greater than 0');
+  });
+
   it('resetProduct restores seeded inventory state', async () => {
     await repository.decreaseStock('1', 1);
     const leasingRow = leasingQtyData.find((item) => item.productId === '1');
