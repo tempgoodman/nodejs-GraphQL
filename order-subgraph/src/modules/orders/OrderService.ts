@@ -9,6 +9,7 @@ export class OrderService {
 async createOrder(userId: string, items: { productId: string, quantity: number }[]) {
     console.log(`User ${userId} is attempting to create an order.`);
 
+    const orderId = `order_${Date.now()}`;
     let totalAmount = 0;
     const orderItems = [];
 
@@ -18,14 +19,14 @@ async createOrder(userId: string, items: { productId: string, quantity: number }
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: `
-            mutation DecreaseStock($id: ID!, $quantity: Int!) {
-              decreaseProductStock(id: $id, quantity: $quantity) {
+            mutation DecreaseStock($id: ID!, $quantity: Int!, $transactionId: ID) {
+              decreaseProductStock(id: $id, quantity: $quantity, transactionId: $transactionId) {
                 id
                 price
               }
             }
           `,
-          variables: { id: item.productId, quantity: item.quantity }
+          variables: { id: item.productId, quantity: item.quantity, transactionId: orderId }
         })
       });
       const result = await response.json();
@@ -51,7 +52,6 @@ async createOrder(userId: string, items: { productId: string, quantity: number }
       orderItems.push(item);
     }
 
-    const orderId = `order_${Date.now()}`;
     const newOrder = {
       id: orderId,
       userId,

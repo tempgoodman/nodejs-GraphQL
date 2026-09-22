@@ -31,8 +31,8 @@ describe('ProductService', () => {
   describe('getProduct', () => {
     it('Use dataloader for batch fetching', async () => {
       const mockResult = [
-        { id: 'prod_1', name: 'MacBook Pro', price: 15000, stock: 10 },
-        { id: 'prod_99', name: 'MacBook Pro3', price: 15000, stock: 10 }
+        { id: 'prod_1', name: 'MacBook Pro', price: 15000, stock: 10, leaseRemainQty: 0 },
+        { id: 'prod_99', name: 'MacBook Pro3', price: 15000, stock: 10, leaseRemainQty: 0 }
       ];
 
       mockRepo.findByIds.mockResolvedValue(mockResult);
@@ -54,7 +54,7 @@ describe('ProductService', () => {
 
     it('Scenario 2: Cache Miss (Redis has no data), should call DB and write to Redis', async () => {
       mockRedis.get.mockResolvedValueOnce(null); 
-      mockRepo.findById.mockResolvedValueOnce({ id: '2', name: 'Mock Banana', price: 1, stock: 100 });
+      mockRepo.findById.mockResolvedValueOnce({ id: '2', name: 'Mock Banana', price: 1, stock: 100, leaseRemainQty: 0 });
       const result = await productService.getProduct('2', ['id', 'name', 'price', 'stock']);
       expect(result?.name).toBe('Mock Banana');
       expect(mockRepo.findById).toHaveBeenCalledWith('2', ['id', 'name', 'price', 'stock']); 
@@ -64,13 +64,22 @@ describe('ProductService', () => {
 
   describe('decreaseProductStock', () => {
     it('Scenario 3: After successfully decreasing stock, should delete the corresponding Redis cache (Cache Invalidation)', async () => {
-      mockRepo.decreaseStock.mockResolvedValueOnce({ id: '1', name: 'Mock Milk', price: 1, stock: 48 });
+      mockRepo.decreaseStock.mockResolvedValueOnce({ id: '1', name: 'Mock Milk', price: 1, stock: 48, leaseRemainQty: 0 });
       mockRedis.keys.mockResolvedValueOnce(['products:limit:10:offset:0']);
       const result = await productService.decreaseProductStock('1', 2);
       expect(result?.stock).toBe(48);
-      expect(mockRepo.decreaseStock).toHaveBeenCalledWith('1', 2);
+      expect(mockRepo.decreaseStock).toHaveBeenCalledWith('1', 2, undefined);
       expect(mockRedis.del).toHaveBeenCalledWith('product:1'); 
       expect(mockRedis.del).toHaveBeenCalledWith(['products:limit:10:offset:0']); 
+    });
+
+    it('passes transactionId to repository for idempotent stock decrease flow', async () => {
+      mockRepo.decreaseStock.mockResolvedValueOnce({ id: '1', name: 'Mock Milk', price: 1, stock: 48, leaseRemainQty: 0 });
+      mockRedis.keys.mockResolvedValueOnce([]);
+
+      await productService.decreaseProductStock('1', 2, 'order-1');
+
+      expect(mockRepo.decreaseStock).toHaveBeenCalledWith('1', 2, 'order-1');
     });
   });
 });

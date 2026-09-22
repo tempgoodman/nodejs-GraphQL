@@ -19,11 +19,13 @@ export type Mutation = {
 export type MutationDecreaseProductStockArgs = {
   id: Scalars['ID']['input'];
   quantity: Scalars['Int']['input'];
+  transactionId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type Product = {
   __typename?: 'Product';
   id: Scalars['ID']['output'];
+  leaseRemainQty: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   price: Scalars['Float']['output'];
   stock: Scalars['Int']['output'];

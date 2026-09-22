@@ -21,8 +21,8 @@ export const buildResolvers = (productService: ProductService) => ({
     },
   },
   Mutation: {
-    decreaseProductStock: async (_: any, { id, quantity }: { id: string, quantity: number }) => {
-      const product = await productService.decreaseProductStock(id, quantity);
+    decreaseProductStock: async (_: any, { id, quantity, transactionId }: { id: string, quantity: number, transactionId?: string }) => {
+      const product = await productService.decreaseProductStock(id, quantity, transactionId);
       return ProductMapper.toGraphQL(product);
     },
     resetProduct: () => productService.resetProduct(),

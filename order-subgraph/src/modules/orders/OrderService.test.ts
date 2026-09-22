@@ -10,6 +10,8 @@ describe('OrderService (Enterprise Edition with Saga Rollback)', () => {
   let mockMqChannel: jest.Mocked<Channel>;
 
   beforeEach(() => {
+    jest.spyOn(Date, 'now').mockReturnValue(1700000000000);
+
     mockRedis = new Redis() as jest.Mocked<Redis>;
     mockRedis.lpush = jest.fn().mockResolvedValue(1);
 
@@ -38,6 +40,8 @@ describe('OrderService (Enterprise Edition with Saga Rollback)', () => {
     const result = await orderService.createOrder('user_123', items);
 
     expect(global.fetch).toHaveBeenCalledTimes(1);
+    const fetchBody = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
+    expect(fetchBody.variables.transactionId).toBe(result.id);
     expect(result.totalAmount).toBe(300);
     expect(mockRedis.lpush).toHaveBeenCalledTimes(1);
 

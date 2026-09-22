@@ -8,6 +8,7 @@ export const typeDefs = `#graphql
     name: String!
     price: Float!
     stock: Int!
+    leaseRemainQty: Int!
   }
 
   type ProductPage {
@@ -22,7 +23,7 @@ export const typeDefs = `#graphql
   }
 
 type Mutation {
-    decreaseProductStock(id: ID!, quantity: Int!): Product
+    decreaseProductStock(id: ID!, quantity: Int!, transactionId: ID): Product
     resetProduct: Boolean
   }
 `;
