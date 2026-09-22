@@ -68,9 +68,18 @@ describe('ProductService', () => {
       mockRedis.keys.mockResolvedValueOnce(['products:limit:10:offset:0']);
       const result = await productService.decreaseProductStock('1', 2);
       expect(result?.stock).toBe(48);
-      expect(mockRepo.decreaseStock).toHaveBeenCalledWith('1', 2);
+      expect(mockRepo.decreaseStock).toHaveBeenCalledWith('1', 2, undefined);
       expect(mockRedis.del).toHaveBeenCalledWith('product:1'); 
       expect(mockRedis.del).toHaveBeenCalledWith(['products:limit:10:offset:0']); 
+    });
+
+    it('passes transactionId to repository for idempotent stock decrease flow', async () => {
+      mockRepo.decreaseStock.mockResolvedValueOnce({ id: '1', name: 'Mock Milk', price: 1, stock: 48, leaseRemainQty: 0 });
+      mockRedis.keys.mockResolvedValueOnce([]);
+
+      await productService.decreaseProductStock('1', 2, 'order-1');
+
+      expect(mockRepo.decreaseStock).toHaveBeenCalledWith('1', 2, 'order-1');
     });
   });
 });

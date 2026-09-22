@@ -64,9 +64,9 @@ export class ProductService {
     }
   }
 
-  async decreaseProductStock(id: string, quantity: number): Promise<Product | null> {
+  async decreaseProductStock(id: string, quantity: number, transactionId?: string): Promise<Product | null> {
     try {
-      const updatedProduct = await this.repository.decreaseStock(id, quantity);
+      const updatedProduct = await this.repository.decreaseStock(id, quantity, transactionId);
       if (updatedProduct) {
         await this.redis.del(`product:${id}`);
         const keys = await this.redis.keys('products:limit:*');

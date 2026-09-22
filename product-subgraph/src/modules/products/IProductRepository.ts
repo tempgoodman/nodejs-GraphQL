@@ -5,6 +5,6 @@ export interface IProductRepository {
   findAll(): Promise<Product[]>;
   findByIds(ids: string[]): Promise<(Product | null)[]>;
   findAndCount(limit: number, offset: number): Promise<{ items: Product[]; totalCount: number }>;
-  decreaseStock(id: string, quantity: number): Promise<Product>;
+  decreaseStock(id: string, quantity: number, transactionId?: string): Promise<Product>;
   resetProduct(): Promise<boolean>;
 }

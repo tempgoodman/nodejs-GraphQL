@@ -94,7 +94,7 @@ export class MockProductRepository implements IProductRepository {
     return { items, totalCount };
   }
 
-  async decreaseStock(id: string, quantity: number): Promise<Product> {
+  async decreaseStock(id: string, quantity: number, transactionId?: string): Promise<Product> {
     if (quantity <= 0) {
       throw new Error('Quantity must be greater than 0');
     }
@@ -109,11 +109,28 @@ export class MockProductRepository implements IProductRepository {
       throw new Error('Sale quantity data not found');
     }
 
+    if (transactionId) {
+      const existingTransaction = saleInventoryTransaction.find(
+        (transaction) => transaction.transactionId === transactionId
+      );
+      if (existingTransaction) {
+        return toProduct(product);
+      }
+    }
+
     if (saleQty.stockQty < quantity) {
       throw new Error('Insufficient stock');
     }
 
     saleQty.stockQty -= quantity;
+    if (transactionId) {
+      saleInventoryTransaction.push({
+        id: `sale-transaction-${saleInventoryTransaction.length + 1}`,
+        transactionId,
+        status: 'SUCCESS',
+        quantityChange: -quantity
+      });
+    }
     return toProduct(product);
   }
   async resetProduct(): Promise<boolean> {

@@ -40,6 +40,23 @@ describe('MockProductRepository', () => {
     expect(saleQtyData.find((item) => item.productId === '2')?.stockQty).toBe(92);
   });
 
+  it('decreaseStock is idempotent when using the same transactionId', async () => {
+    const first = await repository.decreaseStock('2', 10, 'order-2');
+    const second = await repository.decreaseStock('2', 10, 'order-2');
+
+    expect(first.stock).toBe(92);
+    expect(second.stock).toBe(92);
+    expect(saleQtyData.find((item) => item.productId === '2')?.stockQty).toBe(92);
+    expect(saleInventoryTransaction).toHaveLength(1);
+    expect(saleInventoryTransaction[0]).toEqual(
+      expect.objectContaining({
+        transactionId: 'order-2',
+        status: 'SUCCESS',
+        quantityChange: -10
+      })
+    );
+  });
+
   it('decreaseStock throws when product does not exist', async () => {
     await expect(repository.decreaseStock('999', 1)).rejects.toThrow('Product not found');
   });
