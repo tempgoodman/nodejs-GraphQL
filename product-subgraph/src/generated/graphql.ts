@@ -24,6 +24,7 @@ export type MutationDecreaseProductStockArgs = {
 export type Product = {
   __typename?: 'Product';
   id: Scalars['ID']['output'];
+  leaseRemainQty: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   price: Scalars['Float']['output'];
   stock: Scalars['Int']['output'];

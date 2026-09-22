@@ -58,9 +58,11 @@ export const leaseInventoryTransaction: InventoryTransaction[] = [];
 
 const toProduct = (product: ProductData): Product => {
   const saleQty = saleQtyData.find((qty) => qty.productId === product.id);
+  const leasingQty = leasingQtyData.find((qty) => qty.productId === product.id);
   return {
     ...product,
-    stock: saleQty?.stockQty ?? 0
+    stock: saleQty?.stockQty ?? 0,
+    leaseRemainQty: leasingQty?.leaseRemainQty ?? 0
   };
 };
 

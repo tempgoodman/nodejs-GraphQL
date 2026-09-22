@@ -15,7 +15,8 @@ export class ProductMapper {
       id: product.id,
       name: product.name,
       price: product.price,
-      stock: product.stock
+      stock: product.stock,
+      leaseRemainQty: product.leaseRemainQty
     };
   }
 

@@ -8,6 +8,7 @@ export const typeDefs = `#graphql
     name: String!
     price: Float!
     stock: Int!
+    leaseRemainQty: Int!
   }
 
   type ProductPage {
