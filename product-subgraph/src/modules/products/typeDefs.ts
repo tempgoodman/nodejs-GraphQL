@@ -23,7 +23,7 @@ export const typeDefs = `#graphql
   }
 
 type Mutation {
-    decreaseProductStock(id: ID!, quantity: Int!): Product
+    decreaseProductStock(id: ID!, quantity: Int!, transactionId: ID): Product
     resetProduct: Boolean
   }
 `;

@@ -19,6 +19,7 @@ export type Mutation = {
 export type MutationDecreaseProductStockArgs = {
   id: Scalars['ID']['input'];
   quantity: Scalars['Int']['input'];
+  transactionId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type Product = {
